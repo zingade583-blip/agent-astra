@@ -1,4 +1,4 @@
-# LinkedIn Buddy
+# Agent Astra
 
 Workshop guide: build a Fetch.ai agent that writes a LinkedIn post with **ASI:One**, generates an image with **ASI:One**, and publishes it every day at **6:00 PM IST**.
 
@@ -6,7 +6,7 @@ You can chat with it on Agentverse / ASI:One using the **Chat Protocol**.
 
 Works on **Windows** and **Mac**. Use the command for your computer.
 
-Repo: [github.com/ShyamRV/demo-linkedin-agent](https://github.com/ShyamRV/demo-linkedin-agent)
+Repo: [github.com/ShyamRV/agent-astra](https://github.com/zingade583-blip/agent-astra)
 
 ---
 
@@ -27,7 +27,7 @@ If a command fails, try the other one (`python` vs `python3`).
 ## What you will build
 
 ```text
-You (chat)  -->  LinkedIn Buddy (uAgent)
+You (chat)  -->  Agent Astra (uAgent)
                       |
                       +--> ASI:One writes the post
                       +--> ASI:One generates an image
@@ -110,15 +110,15 @@ Wrong URL = `The redirect_uri does not match the registered value`.
 **Windows**
 
 ```powershell
-git clone https://github.com/ShyamRV/demo-linkedin-agent.git
-cd demo-linkedin-agent
+git clone https://github.com/zingade583-blip/agent-astra.git
+cd agent-astra
 ```
 
 **Mac**
 
 ```bash
-git clone https://github.com/ShyamRV/demo-linkedin-agent.git
-cd demo-linkedin-agent
+git clone https://github.com/zingade583-blip/agent-astra.git
+cd agent-astra
 ```
 
 No Git? Download the ZIP from GitHub, unzip it, then open that folder in your terminal.
@@ -195,9 +195,9 @@ POST_HOUR=18
 TIMEZONE_OFFSET=5.5
 
 # Agent identity
-AGENT_NAME=LinkedIn Buddy
-AGENT_HANDLE=linkedin-buddy
-AGENT_SEED=linkedin-fetchai-poster-seed
+AGENT_NAME=Agent Astra
+AGENT_HANDLE=agent-astra
+AGENT_SEED=agent-astra-seed
 AGENT_PORT=8001
 
 # LinkedIn app  — from LinkedIn Developers → Auth
@@ -206,7 +206,7 @@ LINKEDIN_CLIENT_SECRET=your_client_secret
 LINKEDIN_REDIRECT_URI=http://localhost:8000/callback
 ```
 
-Handle must be `linkedin-buddy` (with a hyphen).  
+Handle should be `agent-astra` (with a hyphen), if available.  
 Do **not** use `linkedin buddy` (space). Agentverse will not accept that.
 
 Do not put real secrets on GitHub.
@@ -286,10 +286,10 @@ python3 agent.py
 Good logs look like this:
 
 ```text
-INFO: [LinkedIn Buddy]: Starting agent with address: agent1q...
-INFO: [LinkedIn Buddy]: Agent inspector available at https://agentverse.ai/inspect/?uri=...
-INFO: [LinkedIn Buddy]: Starting server on http://0.0.0.0:8001
-INFO: [LinkedIn Buddy]: Manifest published successfully: AgentChatProtocol
+INFO: [Agent Astra]: Starting agent with address: agent1q...
+INFO: [Agent Astra]: Agent inspector available at https://agentverse.ai/inspect/?uri=...
+INFO: [Agent Astra]: Starting server on http://0.0.0.0:8001
+INFO: [Agent Astra]: Manifest published successfully: AgentChatProtocol
 ```
 
 Leave this terminal open. Do not close it.
@@ -317,7 +317,7 @@ Then use **Chat with Agent** on Agentverse.
 
 ## Step 8 — Talk to the agent
 
-Use **Chat with Agent** on Agentverse, or ASI:One with **`@linkedin-buddy`**.
+Use **Chat with Agent** on Agentverse, or ASI:One with **`@agent-astra`**.
 
 | You type | What happens |
 | --- | --- |
@@ -325,10 +325,10 @@ Use **Chat with Agent** on Agentverse, or ASI:One with **`@linkedin-buddy`**.
 | `status` | Last post + next 6pm slot |
 | `preview` | Draft today's post (does **not** publish) |
 | `preview about uAgents` | Draft about that topic |
-| `post now` | Write, make image, publish today's post |
-| `post about <topic>` | Write, make image, publish that topic |
+| `post now` | Prepare a post and request explicit approval before publishing |
+| `post about <topic>` | Draft a post about that topic and request approval before publishing |
 
-**Try `preview` first.** `post now` and `post about` publish for real.
+**Try `preview` first.** Drafting never publishes. Any real publication must show the full preview and receive explicit user approval first.
 
 ```text
 preview about Fetch.ai Agentverse and ASI:One
@@ -378,13 +378,13 @@ https://your-server.com:8000/submit
 
 | Field | Value |
 | --- | --- |
-| **Name** | LinkedIn Buddy |
-| **Handle** | `@linkedin-buddy` (no space) |
-| **Keywords** | fetch.ai, linkedin, uagents, agentverse, asi:one, daily post, linkedin-buddy |
-| **Description** | Posts about Fetch.ai on LinkedIn every day at 6pm. Uses ASI:One for text and images. |
-| **README** | LinkedIn Buddy writes and publishes a daily Fetch.ai LinkedIn post. Say `preview`, `post now`, or `post about <topic>`. |
+| **Name** | Agent Astra |
+| **Handle** | `@agent-astra` (no space) |
+| **Keywords** | fetch.ai, linkedin, uagents, agentverse, asi:one, daily post, agent-astra |
+| **Description** | Drafts LinkedIn posts with ASI:One and requests explicit approval before any configured publishing action. |
+| **README** | Agent Astra drafts LinkedIn posts. Say `preview`, `post now`, or `post about <topic>`; publication requires explicit approval and a configured LinkedIn integration. |
 
-ASI:One can then find it as **`@linkedin-buddy`**.
+ASI:One can then find it as **`@agent-astra`**.
 
 ---
 
@@ -394,9 +394,9 @@ ASI:One can then find it as **`@linkedin-buddy`**.
 2. **`.env` holds secrets.** Local runs load it automatically. On Agentverse, use Secrets.
 3. **Chat Protocol** is enabled with `publish_manifest=True`. That is why it shows as `AgentChatProtocol`.
 4. **ASI:One** writes the text and creates the image.
-5. **LinkedIn** uploads the image and publishes the post.
-6. Every minute the agent checks the clock. At **6:00 PM** it posts once per day.
-7. Chat can also trigger `preview`, `post now`, or `post about ...` any time.
+5. **LinkedIn** publication requires a configured, authorized integration and explicit user approval after preview.
+6. If scheduled posting is enabled, it must follow a clearly configured approval policy; do not claim a post was published unless LinkedIn confirms success.
+7. Chat can trigger `preview`, `post now`, or `post about ...`; these commands must not bypass approval.
 
 ---
 
@@ -431,7 +431,7 @@ python3 agent.py
 | Localhost page will not load after LinkedIn login | Normal. Copy `code=` from the address bar |
 | Code expired | Run the setup script and log in again |
 | Chat does not respond | Agent must be running. Local agents also need **Connect → Mailbox** |
-| Agent only replies with help | Say `post about ...` or `post now`. Use `@linkedin-buddy` (hyphen) |
+| Agent only replies with help | Say `post about ...` or `post now`. Use `@agent-astra` (hyphen) |
 | `LinkedIn secrets are empty` | Finish Step 5, then restart |
 | Endpoint URL required | You created an External agent. Create a Hosted Agent |
 | 401 from LinkedIn | Token expired. Run `linkedin_setup.py` again |
@@ -452,7 +452,7 @@ python3 agent.py
 - [ ] Inspector → Connect → Mailbox
 - [ ] `preview` works
 - [ ] Hosted Agent on Agentverse with the same secrets
-- [ ] Name **LinkedIn Buddy**, handle **`@linkedin-buddy`**
+- [ ] Name **Agent Astra**, handle **`@agent-astra`**
 
 ---
 
@@ -462,7 +462,7 @@ python3 agent.py
 - ASI:One keys: [asi1.ai/developer](https://asi1.ai/developer)
 - Chat Protocol: [docs.agentverse.ai](https://docs.agentverse.ai/documentation/getting-started/enable-chat-protocol)
 - LinkedIn apps: [linkedin.com/developers/apps](https://www.linkedin.com/developers/apps)
-- This repo: [github.com/ShyamRV/demo-linkedin-agent](https://github.com/ShyamRV/demo-linkedin-agent)
+- This repo: [github.com/ShyamRV/agent-astra](https://github.com/zingade583-blip/agent-astra)
 
 ---
 
@@ -543,13 +543,13 @@ python3.11 --version
 Do this inside the project folder:
 
 ```text
-demo-linkedin-agent
+agent-astra
 ```
 
 **Windows**
 
 ```powershell
-cd demo-linkedin-agent
+cd agent-astra
 py -3.11 -m venv .venv
 source .venv/bin/activate
 python --version
@@ -572,7 +572,7 @@ Then activate again:
 **Mac**
 
 ```bash
-cd demo-linkedin-agent
+cd agent-astra
 python3.11 -m venv .venv
 source .venv/bin/activate
 python --version
@@ -643,14 +643,14 @@ Open **Git Bash** and copy these commands one block at a time.
 
 ```bash
 cd ~
-git clone https://github.com/ShyamRV/demo-linkedin-agent.git
-cd demo-linkedin-agent
+git clone https://github.com/zingade583-blip/agent-astra.git
+cd agent-astra
 ```
 
 If you already cloned it:
 
 ```bash
-cd ~/demo-linkedin-agent
+cd ~/agent-astra
 git pull origin main
 ```
 
@@ -678,7 +678,7 @@ You should see `Python 3.11.9`.
 #### 4) Create venv and install uagents for this project
 
 ```bash
-cd ~/demo-linkedin-agent
+cd ~/agent-astra
 py -3.11 -m venv .venv
 source .venv/Scripts/activate
 python --version
@@ -698,7 +698,7 @@ python agent.py
 Use this only when `py -3.11 --version` already works:
 
 ```bash
-cd ~/demo-linkedin-agent
+cd ~/agent-astra
 git pull origin main
 rm -rf .venv
 py -3.11 -m venv .venv
