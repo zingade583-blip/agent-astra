@@ -1,709 +1,157 @@
-# Agent Astra
+# Agent Astra 🤖
 
-Workshop guide: build a Fetch.ai agent that writes a LinkedIn post with **ASI:One**, generates an image with **ASI:One**, and publishes it every day at **6:00 PM IST**.
+**Agent Astra** is a personal AI agent designed to help users create professional content and manage communication tasks from one place. It aims to support LinkedIn post drafting, email writing, Instagram captions, and content adaptation for different platforms.
 
-You can chat with it on Agentverse / ASI:One using the **Chat Protocol**.
-
-Works on **Windows** and **Mac**. Use the command for your computer.
-
-Repo: [github.com/agent-astra](https://github.com/zingade583-blip/agent-astra)
+🔗 **GitHub Repository:** https://github.com/zingade583-blip/agent-astra
 
 ---
 
-## Before you start
+## 🌟 Project Overview
 
-| You use | Open this app |
-| --- | --- |
-| **Windows** | PowerShell |
-| **Mac** | Terminal |
+Creating content for multiple platforms takes time. Agent Astra aims to simplify this process by allowing users to request different types of content through a single AI agent.
 
-On Windows, `python` is the usual command.  
-On Mac, `python3` is the usual command.
+The project focuses on:
 
-If a command fails, try the other one (`python` vs `python3`).
+- 📝 LinkedIn post drafting
+- 📧 Professional email drafting
+- 📸 Instagram captions and hashtags
+- 🔄 Adapting content for different platforms
+- 🛡️ Human approval before external actions
+- 📊 Clear action status and error reporting
 
----
+**Important:** Actual sending, publishing, and third-party integrations depend on the features implemented in the code and the required API permissions. This README describes the intended workflow; it does not claim that every integration is already operational.
 
-## What you will build
+## ⚙️ How Agent Astra Works
+
+Agent Astra is designed to follow this workflow:
 
 ```text
-You (chat)  -->  Agent Astra (uAgent)
-                      |
-                      +--> ASI:One writes the post
-                      +--> ASI:One generates an image
-                      +--> LinkedIn API publishes it
-                      +--> every day at 6:00 PM it posts by itself
+                USER REQUEST
+                     |
+                     v
+             INTENT CLASSIFICATION
+                     |
+          +----------+----------+
+          |          |          |
+          v          v          v
+      LinkedIn     Email     Instagram
+          |          |          |
+          v          v          v
+     Post Draft  Email Draft  Caption
+          |          |          |
+          +----------+----------+
+                     |
+                     v
+              CONTENT PREVIEW
+                     |
+                     v
+            USER APPROVAL REQUIRED
+                     |
+              +------+------+
+              |             |
+              v             v
+          Not Approved   Approved
+              |             |
+              v             v
+          Keep Draft   Verify Integration
+                            |
+                            v
+                     Execute if Available
+                            |
+                            v
+                     Verify Real Result
 ```
 
-| Piece | What it does |
-| --- | --- |
-| **uAgents** | Agent framework (Fetch.ai) |
-| **Agentverse** | Host / discover / chat with the agent |
-| **Chat Protocol** | Lets ASI:One and Agentverse talk to the agent |
-| **ASI:One** (`asi1.ai`) | Writes the post + generates the image |
-| **LinkedIn UGC API** | Publishes the post on your profile |
+### 1. Understand the request
 
----
+The agent identifies what the user wants to create and which platform is relevant.
 
-## Accounts you need (create these first)
+### 2. Generate the correct content
 
-Do these **before** writing any code.
+- **LinkedIn:** A professional post based on the user's topic and supplied details.
+- **Email:** A recipient, subject line, and complete email body.
+- **Instagram:** A caption with relevant hashtags.
+- **Content adaptation:** Rewrites content for a requested platform or tone.
 
-### 1. Fetch.ai / Agentverse
+The agent should not substitute a LinkedIn post when the user requests an email.
 
-1. Open [agentverse.ai](https://agentverse.ai)
-2. Sign up / log in
-3. Keep this tab open
+### 3. Preview before taking action
 
-### 2. ASI:One API key
+The agent displays the complete draft so the user can review and edit it.
 
-1. Open [asi1.ai](https://asi1.ai) and sign in
-2. Go to [asi1.ai/developer](https://asi1.ai/developer)
-3. Create an API key
-4. Copy it. It looks like `sk_...`
-5. You will paste it into `.env` as `ASI1_API_KEY`
+### 4. Request explicit approval
 
-Hosted agents on Agentverse already get this key. You still need it for **local** runs.
+Writing or drafting content does not grant permission to send or publish it. The agent must obtain clear approval for the specific content and destination before performing an external action.
 
-### 3. LinkedIn Developer App
+### 5. Verify the result
 
-1. Open [linkedin.com/developers/apps](https://www.linkedin.com/developers/apps)
-2. Click **Create app**
-3. Add a name, LinkedIn page, and logo
-4. Open **Products** and enable:
-   - **Sign In with LinkedIn using OpenID Connect**
-   - **Share on LinkedIn**
-5. Open **Auth**
-6. Copy **Client ID** and **Client Secret**
-7. Under **Authorized redirect URLs**, add exactly:
+The agent reports the actual outcome. It must never claim that content was published or an email was sent unless the relevant service confirms success.
+
+## 🛡️ Human Approval and Safety
+
+Agent Astra follows these principles:
+
+- Drafting is the default behavior.
+- Never publish automatically when the user only asks to write or draft.
+- Ask for approval before sending emails or publishing content.
+- Never claim an external action succeeded without confirmation.
+- Use only information provided by the user or available in authorized context.
+- Never invent personal achievements, experiences, or affiliations.
+- Explain clearly when an integration is unavailable.
+- Keep API keys, access tokens, passwords, and client secrets private.
+
+## 🧰 Technology Stack
+
+The project may use the following technologies, depending on the current implementation:
+
+| Technology | Purpose |
+|---|---|
+| Python | Main application and agent logic |
+| uAgents | Agent framework |
+| Agentverse | Hosting, discovery, and agent communication |
+| ASI:One API | AI capabilities, when configured |
+| LinkedIn API | LinkedIn integration, when implemented and authorized |
+| Email API | Email integration, when implemented and authorized |
+| Instagram API | Instagram integration, when implemented and authorized |
+| Git and GitHub | Version control and source-code hosting |
+
+The presence of a technology in this table does not guarantee that its integration is configured or working.
+
+## 📁 Project Structure
 
 ```text
-http://localhost:8000/callback
+agent-astra/
+├── agent.py
+├── linkedin_setup.py
+├── requirements.txt
+├── .env.example
+├── .gitignore
+└── README.md
 ```
 
-Must match exactly:
+- `agent.py` — Main Python agent and its implemented handlers.
+- `linkedin_setup.py` — LinkedIn authentication helper, if used by the project.
+- `requirements.txt` — Python dependencies.
+- `.env.example` — Example environment-variable template containing placeholders.
+- `.gitignore` — Specifies files Git should not track.
+- `README.md` — Project documentation.
 
-- `http` not `https`
-- `localhost` not `127.0.0.1`
-- no slash at the end
-- port `8000`
+A local `.env` file may also exist. It must remain private and must not be committed to GitHub.
 
-Wrong URL = `The redirect_uri does not match the registered value`.
+## 💻 Setup and Installation
 
----
+### Prerequisites
 
-## Files in this project
+- Python
+- Git
+- A terminal such as Command Prompt or PowerShell
+- API credentials for any integrations actually used by the application
 
-| File | Purpose |
-| --- | --- |
-| `agent.py` | The whole agent. Paste this into Agentverse **Build**. |
-| `.env` | Your secrets. **Do not share this file.** |
-| `.env.example` | Empty template of the same keys |
-| `linkedin_setup.py` | One-time script that gets the LinkedIn token |
-| `requirements.txt` | Python packages |
-| `README.md` | This workshop guide |
+### Step 1: Clone the repository
 
----
-
-## Step 1 — Get the code
-
-**Windows**
-
-```powershell
+```bash
 git clone https://github.com/zingade583-blip/agent-astra.git
 cd agent-astra
 ```
 
-**Mac**
-
-```bash
-git clone https://github.com/zingade583-blip/agent-astra.git
-cd agent-astra
-```
-
-No Git? Download the ZIP from GitHub, unzip it, then open that folder in your terminal.
-
----
-
-## Step 2 — Check Python (use 3.11)
-
-This workshop is set up for **Python 3.11**.
-
-**Windows**
-
-```powershell
-python --version
-```
-
-**Mac**
-
-```bash
-python3 --version
-```
-
-You should see `Python 3.11.x`.
-
-If you see another version, or `uagents` fails later, jump to **Fix Python for uAgents** at the end of this README.
-
----
-
-## Step 3 — Install packages
-
-**Windows**
-
-```powershell
-python -m pip install -r requirements.txt
-```
-
-**Mac**
-
-```bash
-python3 -m pip install -r requirements.txt
-```
-
-This installs: `uagents`, `openai`, `requests`, `python-dotenv`.
-
----
-
-## Step 4 — Create `.env`
-
-**Windows**
-
-```powershell
-cp .env.example .env
-```
-
-**Mac**
-
-```bash
-cp .env.example .env
-```
-
-Open `.env` in any editor and fill these values:
-
-```env
-# ASI:One  — from https://asi1.ai/developer
-ASI1_API_KEY=sk_your_key_here
-ASI1_BASE_URL=https://api.asi1.ai/v1
-
-# LinkedIn  — leave these empty until Step 5
-LINKEDIN_ACCESS_TOKEN=
-LINKEDIN_AUTHOR_URN=
-
-# 18 = 6pm, 5.5 = India (IST)
-POST_HOUR=18
-TIMEZONE_OFFSET=5.5
-
-# Agent identity
-AGENT_NAME=Agent Astra
-AGENT_HANDLE=agent-astra
-AGENT_SEED=agent-astra-seed
-AGENT_PORT=8001
-
-# LinkedIn app  — from LinkedIn Developers → Auth
-LINKEDIN_CLIENT_ID=your_client_id
-LINKEDIN_CLIENT_SECRET=your_client_secret
-LINKEDIN_REDIRECT_URI=http://localhost:8000/callback
-```
-
-Handle should be `agent-astra` (with a hyphen), if available.  
-Do **not** use `linkedin buddy` (space). Agentverse will not accept that.
-
-Do not put real secrets on GitHub.
-
----
-
-## Step 5 — Get the LinkedIn token
-
-This login is one time. The script writes two values into `.env`:
-
-- `LINKEDIN_ACCESS_TOKEN` — lets the agent post as you
-- `LINKEDIN_AUTHOR_URN` — `urn:li:person:xxxxxxxx`
-
-### 5.1 Run the script
-
-**Windows**
-
-```powershell
-python linkedin_setup.py
-```
-
-**Mac**
-
-```bash
-python3 linkedin_setup.py
-```
-
-### 5.2 Log in
-
-The script prints a URL. Open it, log in to LinkedIn, click **Allow**.
-
-### 5.3 Copy the code
-
-LinkedIn opens a page like:
-
-```text
-http://localhost:8000/callback?code=AQS...
-```
-
-The page **will not load**. That is normal.
-
-Copy only the part after `code=` (stop before `&` if you see one).
-
-Paste it into the terminal at `Paste the code here:` and press Enter.
-
-The code expires in a few minutes. If it fails, run the script and log in again.
-
-### 5.4 Check `.env`
-
-You should now see:
-
-```env
-LINKEDIN_ACCESS_TOKEN=AQV...
-LINKEDIN_AUTHOR_URN=urn:li:person:xxxxxxxx
-```
-
-The token lasts about **60 days**. If posting starts failing, run `linkedin_setup.py` again.
-
-To post as a company page, use `urn:li:organization:YOUR_ID`.
-
----
-
-## Step 6 — Run the agent on your computer
-
-**Windows**
-
-```powershell
-python agent.py
-```
-
-**Mac**
-
-```bash
-python3 agent.py
-```
-
-Good logs look like this:
-
-```text
-INFO: [Agent Astra]: Starting agent with address: agent1q...
-INFO: [Agent Astra]: Agent inspector available at https://agentverse.ai/inspect/?uri=...
-INFO: [Agent Astra]: Starting server on http://0.0.0.0:8001
-INFO: [Agent Astra]: Manifest published successfully: AgentChatProtocol
-```
-
-Leave this terminal open. Do not close it.
-
-| Warning | What it means |
-| --- | --- |
-| `I do not have enough funds to register on Almanac contract` | Safe to ignore |
-| `LinkedIn secrets are empty` | Finish Step 5, then restart |
-| `ASI1_API_KEY is empty` | Add the ASI:One key to `.env`, then restart |
-
----
-
-## Step 7 — Connect the mailbox (needed for chat)
-
-A local agent cannot receive Agentverse / ASI:One chat until the mailbox is connected.
-
-1. Copy the **Agent inspector** URL from the terminal
-2. Open it in a browser (agent must still be running)
-3. Click **Connect**
-4. Choose **Mailbox**
-
-Then use **Chat with Agent** on Agentverse.
-
----
-
-## Step 8 — Talk to the agent
-
-Use **Chat with Agent** on Agentverse, or ASI:One with **`@agent-astra`**.
-
-| You type | What happens |
-| --- | --- |
-| `help` | Shows commands |
-| `status` | Last post + next 6pm slot |
-| `preview` | Draft today's post (does **not** publish) |
-| `preview about uAgents` | Draft about that topic |
-| `post now` | Prepare a post and request explicit approval before publishing |
-| `post about <topic>` | Draft a post about that topic and request approval before publishing |
-
-**Try `preview` first.** Drafting never publishes. Any real publication must show the full preview and receive explicit user approval first.
-
-```text
-preview about Fetch.ai Agentverse and ASI:One
-```
-
-```text
-post about Fetch.ai Agentverse and ASI:One
-```
-
-You can also paste a LinkedIn profile after `post about`.
-
----
-
-## Step 9 — Host on Agentverse
-
-Use a **Hosted Agent**. Do not use External Integration unless you have a public HTTPS URL.
-
-1. Go to [agentverse.ai](https://agentverse.ai)
-2. Click **Launch an Agent**
-3. Choose **Generate Agent** or a **blank Hosted Agent**
-4. Do **not** choose External Integration (that asks for an Endpoint URL)
-5. Open **Build** and paste all of `agent.py`
-6. Open **`.env` / Secrets** and paste at least:
-   - `LINKEDIN_ACCESS_TOKEN`
-   - `LINKEDIN_AUTHOR_URN`
-   - `POST_HOUR=18`
-   - `TIMEZONE_OFFSET=5.5`
-7. Click **Run**
-
-Hosted agents already get `ASI1_API_KEY`. Extra local settings like `port` and `mailbox` are ignored there. That is normal.
-
-### What is Agent Endpoint URL?
-
-If you see that field, you chose the **external** path by mistake.
-
-It wants a public server address, for example:
-
-```text
-https://your-server.com:8000/submit
-```
-
-`localhost` will not work. Go back and create a **Hosted Agent**.
-
----
-
-## Step 10 — Agentverse profile
-
-| Field | Value |
-| --- | --- |
-| **Name** | Agent Astra |
-| **Handle** | `@agent-astra` (no space) |
-| **Keywords** | fetch.ai, linkedin, uagents, agentverse, asi:one, daily post, agent-astra |
-| **Description** | Drafts LinkedIn posts with ASI:One and requests explicit approval before any configured publishing action. |
-| **README** | Agent Astra drafts LinkedIn posts. Say `preview`, `post now`, or `post about <topic>`; publication requires explicit approval and a configured LinkedIn integration. |
-
-ASI:One can then find it as **`@agent-astra`**.
-
----
-
-## How the agent works
-
-1. **`agent.py` is the whole agent.** One file, easy to paste into Agentverse.
-2. **`.env` holds secrets.** Local runs load it automatically. On Agentverse, use Secrets.
-3. **Chat Protocol** is enabled with `publish_manifest=True`. That is why it shows as `AgentChatProtocol`.
-4. **ASI:One** writes the text and creates the image.
-5. **LinkedIn** publication requires a configured, authorized integration and explicit user approval after preview.
-6. If scheduled posting is enabled, it must follow a clearly configured approval policy; do not claim a post was published unless LinkedIn confirms success.
-7. Chat can trigger `preview`, `post now`, or `post about ...`; these commands must not bypass approval.
-
----
-
-## Restart after you change `.env`
-
-Stop the agent with `Ctrl + C`, then run `agent.py` again.
-
-**Windows**
-
-```powershell
-python agent.py
-```
-
-**Mac**
-
-```bash
-python3 agent.py
-```
-
----
-
-## Troubleshooting
-
-| Problem | Fix |
-| --- | --- |
-| `python` not found on Mac | Use `python3` |
-| `python3` not found on Windows | Use `python` |
-| `python` is not 3.11 / `uagents` fails to install | Follow **Fix Python for uAgents** at the end of this README |
-| `linkedin_setup.py is not recognized` (Windows) | Run `python linkedin_setup.py` from the project folder |
-| `Permission denied` (Mac) | Run `python3 linkedin_setup.py` |
-| `redirect_uri does not match` | Add `http://localhost:8000/callback` exactly in the LinkedIn app |
-| Localhost page will not load after LinkedIn login | Normal. Copy `code=` from the address bar |
-| Code expired | Run the setup script and log in again |
-| Chat does not respond | Agent must be running. Local agents also need **Connect → Mailbox** |
-| Agent only replies with help | Say `post about ...` or `post now`. Use `@agent-astra` (hyphen) |
-| `LinkedIn secrets are empty` | Finish Step 5, then restart |
-| Endpoint URL required | You created an External agent. Create a Hosted Agent |
-| 401 from LinkedIn | Token expired. Run `linkedin_setup.py` again |
-| Almanac contract funds warning | Safe to ignore |
-
----
-
-## Workshop checklist
-
-- [ ] Agentverse account
-- [ ] ASI:One API key in `.env`
-- [ ] LinkedIn app with OpenID + Share on LinkedIn
-- [ ] Redirect URL `http://localhost:8000/callback`
-- [ ] Client ID + Secret in `.env`
-- [ ] `linkedin_setup.py` wrote token + URN
-- [ ] Python **3.11** and packages installed
-- [ ] `agent.py` is running
-- [ ] Inspector → Connect → Mailbox
-- [ ] `preview` works
-- [ ] Hosted Agent on Agentverse with the same secrets
-- [ ] Name **Agent Astra**, handle **`@agent-astra`**
-
----
-
-## Useful links
-
-- Agentverse: [agentverse.ai](https://agentverse.ai)
-- ASI:One keys: [asi1.ai/developer](https://asi1.ai/developer)
-- Chat Protocol: [docs.agentverse.ai](https://docs.agentverse.ai/documentation/getting-started/enable-chat-protocol)
-- LinkedIn apps: [linkedin.com/developers/apps](https://www.linkedin.com/developers/apps)
-- This repo: [github.com/ShyamRV/agent-astra](https://github.com/zingade583-blip/agent-astra)
-
----
-
-## Fix Python for uAgents (use Python 3.11)
-
-Use this section if `uagents` will not install, `agent.py` crashes on import, or your machine has the wrong Python version.
-
-This workshop works best with **one Python: 3.11**.
-
-### Why this happens
-
-Many students have several Pythons installed (3.8, 3.9, 3.12, Store apps, Anaconda).  
-Then `python` points to the wrong one, and `uagents` fails.
-
-### Step A — Check what you have now
-
-**Windows (PowerShell)**
-
-```powershell
-python --version
-where.exe python
-py -0p
-```
-
-**Mac**
-
-```bash
-python3 --version
-which -a python3
-```
-
-You want `Python 3.11.x`.
-
-### Step B — Install Python 3.11
-
-Download from the official page:
-
-- Python 3.11 releases: [python.org/downloads/release/python-3119](https://www.python.org/downloads/release/python-3119/)
-- Or open [python.org/downloads](https://www.python.org/downloads/) and choose **Python 3.11.x**
-
-**Windows**
-
-1. Download **Windows installer (64-bit)**
-2. Run the installer
-3. Tick **Add python.exe to PATH**
-4. Click **Install Now**
-5. Close and reopen PowerShell / Git Bash
-
-**Mac**
-
-1. Download **macOS 64-bit universal2 installer**
-2. Install it
-3. Close and reopen Terminal
-
-### Step C — Confirm 3.11 is the active Python
-
-**Windows**
-
-```powershell
-py -3.11 --version
-python --version
-```
-
-If `python --version` is still wrong, always use:
-
-```powershell
-py -3.11
-```
-
-**Mac**
-
-```bash
-python3.11 --version
-```
-
-### Step D — Create a clean virtual environment for this project
-
-Do this inside the project folder:
-
-```text
-agent-astra
-```
-
-**Windows**
-
-```powershell
-cd agent-astra
-py -3.11 -m venv .venv
-source .venv/bin/activate
-python --version
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
-
-If PowerShell blocks activation, run this once:
-
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-```
-
-Then activate again:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-**Mac**
-
-```bash
-cd agent-astra
-python3.11 -m venv .venv
-source .venv/bin/activate
-python --version
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
-
-You should see `Python 3.11.x` after activation.
-
-### Step E — Run the agent with that environment
-
-Keep the venv activated, then:
-
-```powershell
-python linkedin_setup.py
-python agent.py
-```
-
-On Mac, same commands after `source .venv/bin/activate`.
-
-### Step F — If it still fails, remove the old broken environment
-
-**Windows**
-
-```powershell
-deactivate
-Remove-Item -Recurse -Force .venv
-py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-```
-
-**Mac**
-
-```bash
-deactivate
-rm -rf .venv
-python3.11 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-```
-
-### Quick checks
-
-| Check | Expected |
-| --- | --- |
-| `python --version` inside `.venv` | `Python 3.11.x` |
-| `python -m pip show uagents` | Shows package info |
-| `python agent.py` | Agent starts on your `AGENT_PORT` |
-
-### Extra tips for workshop machines
-
-- Prefer **python.org** installers. Avoid mixing Anaconda + Store Python + random old installs for this demo.
-- Always activate `.venv` before running `agent.py`.
-- If classmates already pulled the repo, they only need:
-
-```powershell
-git pull origin main
-```
-
-Then recreate `.venv` with Python 3.11 as above.
-
-### Exact commands from Git Bash (Windows)
-
-Open **Git Bash** and copy these commands one block at a time.
-
-#### 1) Pull the latest project
-
-```bash
-cd ~
-git clone https://github.com/zingade583-blip/agent-astra.git
-cd agent-astra
-```
-
-If you already cloned it:
-
-```bash
-cd ~/agent-astra
-git pull origin main
-```
-
-#### 2) Download Python 3.11 from Git Bash
-
-```bash
-cd ~
-curl -L -o python-3.11.9-amd64.exe https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
-```
-
-#### 3) Install Python 3.11 (adds PATH + py launcher)
-
-```bash
-./python-3.11.9-amd64.exe /quiet InstallAllUsers=0 PrependPath=1 Include_launcher=1 Include_test=0
-```
-
-Close Git Bash, open a **new** Git Bash window, then check:
-
-```bash
-py -3.11 --version
-```
-
-You should see `Python 3.11.9`.
-
-#### 4) Create venv and install uagents for this project
-
-```bash
-cd ~/agent-astra
-py -3.11 -m venv .venv
-source .venv/Scripts/activate
-python --version
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
-
-#### 5) Run the agent
-
-```bash
-python linkedin_setup.py
-python agent.py
-```
-
-#### One-block recovery (if Python is already installed as 3.11)
-
-Use this only when `py -3.11 --version` already works:
-
-```bash
-cd ~/agent-astra
-git pull origin main
-rm -rf .venv
-py -3.11 -m venv .venv
-source .venv/Scripts/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python agent.py
-```
+### Step 2
