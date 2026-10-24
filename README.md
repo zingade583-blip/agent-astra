@@ -6,7 +6,7 @@ You can chat with it on Agentverse / ASI:One using the **Chat Protocol**.
 
 Works on **Windows** and **Mac**. Use the command for your computer.
 
-Repo: [github.com/ShyamRV/agent-astra](https://github.com/zingade583-blip/agent-astra)
+Repo: [github.com/agent-astra](https://github.com/zingade583-blip/agent-astra)
 
 ---
 
